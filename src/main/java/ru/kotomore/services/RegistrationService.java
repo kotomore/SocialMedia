@@ -2,6 +2,7 @@ package ru.kotomore.services;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kotomore.dto.UserDTO;
@@ -17,6 +18,7 @@ public class RegistrationService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
+    @CacheEvict(value = "user_details")
     public Optional<User> saveUser(UserDTO userDTO) {
         User savedUser;
         Optional<User> oldUser = userRepository.findByEmail(userDTO.getEmail());

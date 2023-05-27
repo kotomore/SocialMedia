@@ -1,6 +1,7 @@
 package ru.kotomore.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.kotomore.models.User;
@@ -16,6 +17,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     private final UserRepository userRepository;
 
     @Override
+    @Cacheable(value = "user_details")
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByEmail(s);
 
