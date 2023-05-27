@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +32,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsService service;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest,
+                                    @NonNull HttpServletResponse httpServletResponse,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+
         try {
             final String token = getTokenFromRequest(httpServletRequest);
             if (token != null && jwtProvider.validateAccessToken(token)) {
@@ -49,7 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (AuthException | UsernameNotFoundException | ExpiredJwtException ex) {
             httpServletResponse.getWriter().write(ex.getMessage());
-
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
