@@ -27,6 +27,7 @@ public class PostService {
         post.setUser(user);
         post.setTitle(createPostDTO.getTitle());
         post.setBody(createPostDTO.getBody());
+        post.setImageUrl(createPostDTO.getImageUrl());
         //TODO: Добавить валидацию
         return postRepository.save(post);
     }
