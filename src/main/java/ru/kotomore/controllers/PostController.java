@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,13 +19,14 @@ import ru.kotomore.security.UserDetails;
 import ru.kotomore.services.PostService;
 
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
     private final ModelMapper modelMapper;
 
     @PostMapping
+    @Operation(summary = "Создать пост", description = "Позволяет создать пост для текущего пользователя")
     public ResponseEntity<PostDTO> createPost(@RequestBody CreatePostDTO createpostDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -34,6 +36,8 @@ public class PostController {
     }
 
     @GetMapping
+    @Operation(summary = "Посты пользователя", description = "Отображает посты пользователя," +
+            "которые он создал")
     public ResponseEntity<Page<PostDTO>> getUserPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -52,15 +56,18 @@ public class PostController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDTO,
+    @PutMapping("/{id}")
+    @Operation(summary = "Редактирование поста", description = "Позволяет редактировать пост текущего пользователя")
+    public ResponseEntity<PostDTO> updatePost(@PathVariable Long id,
+                                              @Valid @RequestBody CreatePostDTO createPostDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
 
-        Post savedPost = postService.updatePost(userDetails.user(), postDTO);
+        Post savedPost = postService.updatePost(userDetails.user(), id, createPostDTO);
         return ResponseEntity.ok(modelMapper.map(savedPost, PostDTO.class));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление поста", description = "Позволяет удалить пост текущего пользователя.")
     public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
                                            @AuthenticationPrincipal UserDetails userDetails) {
 

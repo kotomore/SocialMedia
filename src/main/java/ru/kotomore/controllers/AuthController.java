@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import ru.kotomore.services.AuthService;
 import ru.kotomore.services.RegistrationService;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
@@ -26,26 +27,29 @@ public class AuthController {
     private final RegistrationService registrationService;
 
     @PostMapping("/registration")
+    @Operation(summary = "Регистрация нового пользователя", description = "Позволяет создать учетную запись для " +
+            "доступа к функционалу приложения. При регистрации необходимо предоставить данные пользователя, " +
+            "такие как имя, электронная почта и пароль. После успешной регистрации пользователь " +
+            "получает доступ к своему аккаунту и может войти в систему")
     public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) {
         log.info("Регистрация нового пользователя. Email - " + userDTO.getEmail());
         return ResponseEntity.of(registrationService.saveUser(userDTO));
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Получение API токена для аутентификации", description = "Пользователь предоставляет " +
+            "учетные данные (электронную почту и пароль) для получения токена доступа, " +
+            "который используется для авторизации запросов")
     public JwtResponse login(@Valid @RequestBody JwtRequest authRequest) {
         log.info("Попытка авторизации. Email - " + authRequest.getEmail());
         return authService.login(authRequest);
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Обновление API токена", description = "Позволяет пользователю обновить срок " +
+            "действия текущего API токена")
     public JwtResponse refresh_token(@Valid @RequestBody RefreshJwtRequest request) {
         log.info("Обновление токена");
         return authService.refresh(request.getRefreshToken());
-    }
-
-    @PostMapping("/token")
-    public JwtResponse getNewAccessToken(@Valid @RequestBody RefreshJwtRequest request) {
-        log.info("Получение токена");
-        return authService.getAccessToken(request.getRefreshToken());
     }
 }

@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -18,20 +19,22 @@ import ru.kotomore.security.UserDetails;
 import ru.kotomore.services.PostService;
 
 @RestController
-@RequestMapping("/api/v1/feed")
+@RequestMapping("/feed")
 @AllArgsConstructor
 public class FeedController {
     private final PostService postService;
     private final ModelMapper modelMapper;
 
     @GetMapping
+    @Operation(summary = "Лента активности пользователя", description = "Отображает посты от" +
+            "пользователей, на которых он подписан.")
     public ResponseEntity<Page<PostDTO>> getUserFeed(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ASC") String sort,
+            @RequestParam(defaultValue = "ASC") Sort.Direction sort,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
+        Pageable pageable = PageRequest.of(page, size, sort, "createdAt");
 
         Page<Post> userFeed = postService.getPostsOfFollowedUsers(userDetails.user(), pageable);
         if (userFeed.isEmpty()) {

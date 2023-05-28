@@ -50,18 +50,4 @@ public class AuthService {
         }
         return new JwtResponse();
     }
-
-    public JwtResponse getAccessToken(@NonNull String refreshToken) {
-        if (jwtProvider.validateRefreshToken(refreshToken)) {
-            final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
-            final String login = claims.getSubject();
-            final String saveRefreshToken = refreshStorage.get(login);
-            if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = (service.loadUserByUsername(login)).user();
-                final String accessToken = jwtProvider.generateAccessToken(user);
-                return new JwtResponse(accessToken, null);
-            }
-        }
-        return new JwtResponse();
-    }
 }

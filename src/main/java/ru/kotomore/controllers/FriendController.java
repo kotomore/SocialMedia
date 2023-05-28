@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,13 @@ import ru.kotomore.services.FriendshipService;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/friends")
+@RequestMapping("/friends")
 @AllArgsConstructor
 public class FriendController {
     private final FriendshipService friendshipService;
 
-    @PostMapping("/add")
+    @PostMapping
+    @Operation(summary = "Одобряет или создаёт заявку на добавление в друзья")
     public ResponseEntity<String> sendOrAcceptFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
                                                             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -27,15 +29,18 @@ public class FriendController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> rejectFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удаляет пользователя из списка друзей или отклоняет заявку в друзья")
+    public ResponseEntity<String> rejectFriendRequest(@PathVariable Long id,
                                                       @AuthenticationPrincipal UserDetails userDetails) {
 
-        String response = friendshipService.rejectFriendRequest(userDetails.user(), friendDTO.getUserId());
+        String response = friendshipService.rejectFriendRequest(userDetails.user(), id);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getAll")
+    @GetMapping
+    @Operation(summary = "Возвращает список заявок на дружбу", description = "В зависимости от выбранного статуса " +
+            "отображает заявки на дружбу (Ожидает подтверждения, принята, отклонена)")
     public ResponseEntity<UserFriendsDTO> getFriendList(@RequestParam FriendshipStatus status,
                                                         @AuthenticationPrincipal UserDetails userDetails) {
 
