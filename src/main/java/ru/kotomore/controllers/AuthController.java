@@ -4,16 +4,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.kotomore.dto.CreatedUserDTO;
 import ru.kotomore.dto.UserDTO;
 import ru.kotomore.dto.security.JwtRequest;
 import ru.kotomore.dto.security.JwtResponse;
 import ru.kotomore.dto.security.RefreshJwtRequest;
-import ru.kotomore.models.User;
 import ru.kotomore.services.AuthService;
 import ru.kotomore.services.RegistrationService;
 
@@ -25,15 +25,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final RegistrationService registrationService;
+    private final ModelMapper modelMapper;
 
     @PostMapping("/registration")
     @Operation(summary = "Регистрация нового пользователя", description = "Позволяет создать учетную запись для " +
             "доступа к функционалу приложения. При регистрации необходимо предоставить данные пользователя, " +
             "такие как имя, электронная почта и пароль. После успешной регистрации пользователь " +
             "получает доступ к своему аккаунту и может войти в систему")
-    public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) {
+    public CreatedUserDTO register(@Valid @RequestBody UserDTO userDTO) {
         log.info("Регистрация нового пользователя. Email - " + userDTO.getEmail());
-        return ResponseEntity.of(registrationService.saveUser(userDTO));
+        return modelMapper.map(registrationService.saveUser(userDTO), CreatedUserDTO.class);
     }
 
     @PostMapping("/login")

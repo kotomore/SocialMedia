@@ -46,6 +46,9 @@ public class FriendController {
                                                         @AuthenticationPrincipal UserDetails userDetails) {
 
         Set<Long> ids = friendshipService.getFriendsIdByStatus(userDetails.user(), status);
+        if (ids.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         UserFriendsDTO userFriendsDTO = new UserFriendsDTO(status.getDescription(), ids);
         return ResponseEntity.ok(userFriendsDTO);
     }
