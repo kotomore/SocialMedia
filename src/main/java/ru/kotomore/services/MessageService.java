@@ -20,6 +20,13 @@ public class MessageService {
     private final UserRepository userRepository;
 
 
+    /**
+     * Отправить запрос на переписку
+     *
+     * @param user        Пользователь, который отправляет заявку на переписку
+     * @param messageDTO  DTO содержащий информацию для отправки запроса на переписку
+     * @return Сообщение со статусом заявки
+     */
     public SuccessMessage sendMessageRequest(User user, MessageDTO messageDTO) {
         Long recipientId = messageDTO.getUserId();
         String text = messageDTO.getText();

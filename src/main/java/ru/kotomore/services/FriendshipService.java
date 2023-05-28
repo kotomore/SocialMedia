@@ -26,6 +26,12 @@ public class FriendshipService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Подписать пользователя на обновления другого
+     *
+     * @param follower   Подписчик
+     * @param following  Пользователь, на которого будет создана подписка
+     */
     private void subscribe(User follower, User following) {
         Optional<Subscription> existingSubscription = subscriptionRepository
                 .findByFollowerAndFollowing(follower, following);
@@ -50,6 +56,13 @@ public class FriendshipService {
         return new SuccessMessage("Заявка на добавление данного пользователя в друзья отправлена");
     }
 
+    /**
+     * Отправить заявку на добавление в друзья
+     *
+     * @param user         Пользователь, который отправляет заявку
+     * @param recipientId  ID пользователя, которому отправляется заявка
+     * @return Сообщение с информацией о статусе заявки
+     */
     public SuccessMessage sendFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
             throw new SubscribeException("Вы не можете подписаться на самого себя");
@@ -92,6 +105,13 @@ public class FriendshipService {
         subscriptionRepository.delete(existingSubscription.get());
     }
 
+    /**
+     * Отменить запрос на дружбу либо удалить из друзей
+     *
+     * @param user         Пользователь, который отменяет заявку на дружбу
+     * @param recipientId  ID пользователя, заявку которого отменяем
+     * @return Сообщение о статусе заявки
+     */
     public SuccessMessage rejectFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
             throw new SubscribeException("Вы не можете отписаться от самого себя");
@@ -118,6 +138,13 @@ public class FriendshipService {
                 .orElseThrow(() -> new SubscribeException("Текущей подписки не обнаружено"));
     }
 
+    /**
+     * Получить ID пользователей по статусу дружбы
+     *
+     * @param user    Пользователь, чьи заявки необходимо получить
+     * @param status  Статус заявки (Отменена, Подтверждена, В ожидании)
+     * @return Список ID пользователей
+     */
     public Set<Long> getFriendsIdByStatus(User user, FriendshipStatus status) {
         return friendshipRepository.findByUserAndStatus(user, status)
                 .stream()
