@@ -32,7 +32,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPostDTO);
     }
 
-    @GetMapping("/my")
+    @GetMapping
     public ResponseEntity<Page<PostDTO>> getUserPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -48,25 +48,6 @@ public class PostController {
             // Получаем DTO постов текущего пользователя
             Page<PostDTO> postDTOs = userPosts.map(post -> modelMapper.map(post, PostDTO.class));
             return ResponseEntity.ok(postDTOs);
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<PostDTO>> getUserFeed(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ASC") String sort,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
-
-        Page<Post> userFeed = postService.getPostsOfFollowedUsers(userDetails.user(), pageable);
-        if (userFeed.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            // Получаем DTO постов для текущего пользователя
-            Page<PostDTO> postDTOS = userFeed.map(post -> modelMapper.map(post, PostDTO.class));
-            return ResponseEntity.ok(postDTOS);
         }
     }
 

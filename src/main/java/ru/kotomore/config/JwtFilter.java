@@ -65,15 +65,6 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
         }
-
-        String requestURI = request.getRequestURI();
-        String requestMethod = request.getMethod();
-
-        // Проверка URL-адресов или путей запросов для исключения методов получения токена
-        if (bearer == null && !(requestURI.contains("/auth/") && requestMethod.equals("POST"))) {
-            throw new MissingJwtTokenException();
-        }
-
         return null;
     }
 }
