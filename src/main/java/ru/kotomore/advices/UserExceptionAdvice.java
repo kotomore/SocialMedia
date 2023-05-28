@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.kotomore.exceptions.SendMessageException;
 import ru.kotomore.exceptions.SubscribeException;
 import ru.kotomore.exceptions.UserNotFoundException;
 
@@ -34,4 +35,10 @@ public class UserExceptionAdvice {
         return new ResponseEntity<>(new ErrorMessage(ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
+    @ResponseBody
+    @ExceptionHandler(SendMessageException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> sendMessageException(SendMessageException ex) {
+        return new ResponseEntity<>(new ErrorMessage(ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
+    }
 }
