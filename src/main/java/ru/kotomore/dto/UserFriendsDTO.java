@@ -12,6 +12,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserFriendsDTO {
-    String status;
-    Set<Long> ids;
+    private String status;
+    private Set<Long> ids;
 }

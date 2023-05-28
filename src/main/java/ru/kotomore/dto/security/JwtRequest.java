@@ -17,8 +17,8 @@ public class JwtRequest implements Serializable {
 
     @NotEmpty(message = "не может быть пустым")
     @Email(message = " должно содержать адрес электронной почты")
-    public String email;
+    private String email;
 
     @NotEmpty(message = "не может быть пустым")
-    public String password;
+    private String password;
 }

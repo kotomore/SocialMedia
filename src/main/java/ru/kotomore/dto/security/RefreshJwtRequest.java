@@ -13,5 +13,5 @@ import lombok.Setter;
 public class RefreshJwtRequest {
 
     @NotEmpty(message = "не может быть пустым")
-    public String refreshToken;
+    private String refreshToken;
 }

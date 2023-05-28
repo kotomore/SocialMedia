@@ -2,6 +2,7 @@ package ru.kotomore.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.exceptions.SubscribeException;
 import ru.kotomore.exceptions.UserNotFoundException;
 import ru.kotomore.models.Friendship;
@@ -37,7 +38,7 @@ public class FriendshipService {
         subscriptionRepository.save(subscription);
     }
 
-    private String createFriendRequest(User sender, User recipient) {
+    private SuccessMessage createFriendRequest(User sender, User recipient) {
         Friendship friendship = new Friendship();
         friendship.setRecipient(recipient);
         friendship.setSender(sender);
@@ -46,10 +47,10 @@ public class FriendshipService {
         subscribe(sender, recipient);
 
         friendshipRepository.save(friendship);
-        return "Заявка на добавление данного пользователя в друзья отправлена";
+        return new SuccessMessage("Заявка на добавление данного пользователя в друзья отправлена");
     }
 
-    public String sendFriendRequest(User user, Long recipientId) {
+    public SuccessMessage sendFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
             throw new SubscribeException("Вы не можете подписаться на самого себя");
         }
@@ -60,7 +61,7 @@ public class FriendshipService {
         // Поиск уже отправленных заявок на дружбу
         Optional<Friendship> existingFriendship = friendshipRepository.findBySenderAndRecipient(user, recipient);
         if (existingFriendship.isPresent()) {
-            return "Заявка на добавление данного пользователя в друзья уже отправлена";
+            throw new SubscribeException("Заявка на добавление данного пользователя в друзья уже отправлена");
         }
 
         // Если была заявка на дружбу от получателя, то обрабатываем ее
@@ -68,7 +69,7 @@ public class FriendshipService {
         if (existingFriendRequest.isPresent()) {
             subscribe(user, recipient);
             changeStatus(existingFriendRequest.get(), FriendshipStatus.ACCEPTED);
-            return "Заявка на добавление в друзья от данного пользователя одобрена";
+            return new SuccessMessage("Заявка на добавление в друзья от данного пользователя одобрена");
         }
 
         // Иначе создаем новую заявку
@@ -91,7 +92,7 @@ public class FriendshipService {
         subscriptionRepository.delete(existingSubscription.get());
     }
 
-    public String rejectFriendRequest(User user, Long recipientId) {
+    public SuccessMessage rejectFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
             throw new SubscribeException("Вы не можете отписаться от самого себя");
         }
@@ -106,9 +107,9 @@ public class FriendshipService {
         }
 
         changeStatus(existingFriendRequest, FriendshipStatus.REJECTED);
-        return existingFriendRequest.getStatus() == FriendshipStatus.ACCEPTED
+        return new SuccessMessage(existingFriendRequest.getStatus() == FriendshipStatus.ACCEPTED
                 ? "Пользователь удален из друзей"
-                : "Заявка на добавление в друзья от данного пользователя отклонена";
+                : "Заявка на добавление в друзья от данного пользователя отклонена");
     }
 
     private Friendship findExistingFriendRequest(User user, User recipient) {

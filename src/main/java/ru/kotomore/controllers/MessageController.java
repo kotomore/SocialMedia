@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kotomore.dto.MessageDTO;
+import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.security.UserDetails;
 import ru.kotomore.services.MessageService;
 
@@ -22,10 +23,10 @@ public class MessageController {
     @PostMapping
     @Operation(summary = "Отправляет запрос на переписку", description = "Пользователи являющиеся друзьями" +
             "могут отправить запрос на переписку")
-    public ResponseEntity<String> sendOrAcceptFriendRequest(@Valid @RequestBody MessageDTO messageDTO,
-                                                            @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<SuccessMessage> sendOrAcceptFriendRequest(@Valid @RequestBody MessageDTO messageDTO,
+                                                                    @AuthenticationPrincipal UserDetails userDetails) {
 
-        String response = messageService.sendMessageRequest(userDetails.user(), messageDTO);
+        SuccessMessage response = messageService.sendMessageRequest(userDetails.user(), messageDTO);
         return ResponseEntity.ok(response);
     }
 }

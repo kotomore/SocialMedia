@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.kotomore.dto.FriendDTO;
+import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.dto.UserFriendsDTO;
 import ru.kotomore.models.FriendshipStatus;
 import ru.kotomore.security.UserDetails;
@@ -22,19 +23,19 @@ public class FriendController {
 
     @PostMapping
     @Operation(summary = "Одобряет или создаёт заявку на добавление в друзья")
-    public ResponseEntity<String> sendOrAcceptFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
+    public ResponseEntity<SuccessMessage> sendOrAcceptFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
                                                             @AuthenticationPrincipal UserDetails userDetails) {
 
-        String response = friendshipService.sendFriendRequest(userDetails.user(), friendDTO.getUserId());
+        SuccessMessage response = friendshipService.sendFriendRequest(userDetails.user(), friendDTO.getUserId());
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаляет пользователя из списка друзей или отклоняет заявку в друзья")
-    public ResponseEntity<String> rejectFriendRequest(@PathVariable Long id,
-                                                      @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<SuccessMessage> rejectFriendRequest(@PathVariable Long id,
+                                                              @AuthenticationPrincipal UserDetails userDetails) {
 
-        String response = friendshipService.rejectFriendRequest(userDetails.user(), id);
+        SuccessMessage response = friendshipService.rejectFriendRequest(userDetails.user(), id);
         return ResponseEntity.ok(response);
     }
 

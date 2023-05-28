@@ -13,7 +13,7 @@ import lombok.Setter;
 public class MessageDTO {
 
     @NotNull(message = "Укажите ID пользователя")
-    Long userId;
+    private Long userId;
 
-    String text;
+    private String text;
 }

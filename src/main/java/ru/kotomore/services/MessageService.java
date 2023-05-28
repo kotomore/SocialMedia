@@ -3,6 +3,7 @@ package ru.kotomore.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kotomore.dto.MessageDTO;
+import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.exceptions.SendMessageException;
 import ru.kotomore.exceptions.UserNotFoundException;
 import ru.kotomore.models.FriendshipStatus;
@@ -19,7 +20,7 @@ public class MessageService {
     private final UserRepository userRepository;
 
 
-    public String sendMessageRequest(User user, MessageDTO messageDTO) {
+    public SuccessMessage sendMessageRequest(User user, MessageDTO messageDTO) {
         Long recipientId = messageDTO.getUserId();
         String text = messageDTO.getText();
 
@@ -36,19 +37,19 @@ public class MessageService {
 
         // Поиск уже отправленных заявок на переписку
         if (messageRepository.existsBySenderAndRecipient(user, recipient)) {
-            return "Заявка на переписку уже отправлена";
+            throw new SendMessageException("Заявка на переписку уже отправлена");
         }
 
         // Иначе создаем новую заявку
         return createFriendRequest(user, recipient, text);
     }
 
-    private String createFriendRequest(User user, User recipient, String text) {
+    private SuccessMessage createFriendRequest(User user, User recipient, String text) {
         Message message = new Message();
         message.setSender(user);
         message.setRecipient(recipient);
         message.setContent(text);
         messageRepository.save(message);
-        return "Заявка на переписку отправлена";
+        return new SuccessMessage("Заявка на переписку отправлена");
     }
 }
