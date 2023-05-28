@@ -36,9 +36,6 @@ public class AuthController {
     @PostMapping("/login")
     public JwtResponse login(@RequestBody JwtRequest authRequest) {
         log.info("Попытка авторизации. Email - " + authRequest.getEmail());
-        UsernamePasswordAuthenticationToken authInputToken =
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword());
-        authenticationManager.authenticate(authInputToken);
         return authService.login(authRequest);
     }
 

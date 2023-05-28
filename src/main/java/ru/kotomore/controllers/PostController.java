@@ -33,7 +33,7 @@ public class PostController {
     }
 
     @GetMapping("/my")
-    public Page<PostDTO> getUserPosts(
+    public ResponseEntity<Page<PostDTO>> getUserPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sort,
@@ -41,14 +41,18 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
 
-        // Получаем DTO постов текущего пользователя
-        return postService
-                .getPostsByUser(userDetails.user(), pageable)
-                .map(post -> modelMapper.map(post, PostDTO.class));
+        Page<Post> userPosts = postService.getPostsByUser(userDetails.user(), pageable);
+        if (userPosts.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            // Получаем DTO постов текущего пользователя
+            Page<PostDTO> postDTOs = userPosts.map(post -> modelMapper.map(post, PostDTO.class));
+            return ResponseEntity.ok(postDTOs);
+        }
     }
 
     @GetMapping
-    public Page<PostDTO> getUserFeed(
+    public ResponseEntity<Page<PostDTO>> getUserFeed(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sort,
@@ -56,10 +60,14 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
 
-        // Получаем DTO постов текущего пользователя
-        return postService
-                .getPostsOfFollowedUsers(userDetails.user(), pageable)
-                .map(post -> modelMapper.map(post, PostDTO.class));
+        Page<Post> userFeed = postService.getPostsOfFollowedUsers(userDetails.user(), pageable);
+        if (userFeed.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            // Получаем DTO постов для текущего пользователя
+            Page<PostDTO> postDTOS = userFeed.map(post -> modelMapper.map(post, PostDTO.class));
+            return ResponseEntity.ok(postDTOS);
+        }
     }
 
     @PutMapping

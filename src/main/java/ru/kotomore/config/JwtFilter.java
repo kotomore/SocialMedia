@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.kotomore.exceptions.MissingJwtTokenException;
 import ru.kotomore.security.JwtProvider;
 import ru.kotomore.services.UserDetailsService;
 
@@ -51,8 +52,9 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        } catch (AuthException | UsernameNotFoundException | ExpiredJwtException ex) {
+        } catch (AuthException | UsernameNotFoundException | ExpiredJwtException | MissingJwtTokenException ex) {
             httpServletResponse.getWriter().write(ex.getMessage());
+            return;
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -63,6 +65,15 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
         }
+
+        String requestURI = request.getRequestURI();
+        String requestMethod = request.getMethod();
+
+        // Проверка URL-адресов или путей запросов для исключения методов получения токена
+        if (bearer == null && !(requestURI.contains("/auth/") && requestMethod.equals("POST"))) {
+            throw new MissingJwtTokenException();
+        }
+
         return null;
     }
 }

@@ -1,6 +1,5 @@
 package ru.kotomore.services;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,10 +33,6 @@ public class PostService {
 
     public Page<Post> getPostsByUser(User user, Pageable pageable) {
         // Получение постов пользователя
-        Page<Post> posts = postRepository.findByUser(user, pageable);
-        if (posts.isEmpty()) {
-            throw new EntityNotFoundException("Посты не найдены для пользователя: " + user.getEmail());
-        }
         return postRepository.findByUser(user, pageable);
     }
 

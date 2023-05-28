@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import ru.kotomore.dto.security.JwtRequest;
@@ -27,11 +26,7 @@ public class AuthService {
         UsernamePasswordAuthenticationToken authInputToken =
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
                         authRequest.getPassword());
-        try {
-            authenticationManager.authenticate(authInputToken);
-        } catch (BadCredentialsException e) {
-            return new JwtResponse();
-        }
+        authenticationManager.authenticate(authInputToken);
 
         final User user = (service.loadUserByUsername(authRequest.getEmail())).user();
         final String accessToken = jwtProvider.generateAccessToken(user);

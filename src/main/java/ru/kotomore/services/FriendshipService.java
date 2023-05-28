@@ -2,6 +2,8 @@ package ru.kotomore.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kotomore.exceptions.SubscribeException;
+import ru.kotomore.exceptions.UserNotFoundException;
 import ru.kotomore.models.Friendship;
 import ru.kotomore.models.FriendshipStatus;
 import ru.kotomore.models.Subscription;
@@ -27,7 +29,7 @@ public class FriendshipService {
         Optional<Subscription> existingSubscription = subscriptionRepository
                 .findByFollowerAndFollowing(follower, following);
         if (existingSubscription.isPresent()) {
-            throw new RuntimeException("Вы уже подписаны");
+            throw new SubscribeException("Вы уже подписаны на пользователя");
         }
         Subscription subscription = new Subscription();
         subscription.setFollower(follower);
@@ -49,11 +51,11 @@ public class FriendshipService {
 
     public String sendFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
-            throw new RuntimeException("Вы не можете подписаться на самого себя");
+            throw new SubscribeException("Вы не можете подписаться на самого себя");
         }
 
         User recipient = userRepository.findById(recipientId)
-                .orElseThrow(() -> new RuntimeException("Пользователь с таким айди не найден"));
+                .orElseThrow(() -> new UserNotFoundException(recipientId));
 
         // Поиск уже отправленных заявок на дружбу
         Optional<Friendship> existingFriendship = friendshipRepository.findBySenderAndRecipient(user, recipient);
@@ -83,7 +85,7 @@ public class FriendshipService {
                 .findByFollowerAndFollowing(follower, following);
 
         if (existingSubscription.isEmpty()) {
-            throw new RuntimeException("Подписка отсутствует");
+            throw new SubscribeException("Подписка отсутствует");
         }
 
         subscriptionRepository.delete(existingSubscription.get());
@@ -91,11 +93,11 @@ public class FriendshipService {
 
     public String rejectFriendRequest(User user, Long recipientId) {
         if (user.getId().equals(recipientId)) {
-            throw new IllegalArgumentException("Вы не можете отписаться от самого себя");
+            throw new SubscribeException("Вы не можете отписаться от самого себя");
         }
 
         User recipient = userRepository.findById(recipientId)
-                .orElseThrow(() -> new RuntimeException("Пользователь с таким айди не найден"));
+                .orElseThrow(() -> new UserNotFoundException(recipientId));
 
         Friendship existingFriendRequest = findExistingFriendRequest(user, recipient);
 
@@ -112,7 +114,7 @@ public class FriendshipService {
     private Friendship findExistingFriendRequest(User user, User recipient) {
         return friendshipRepository.findBySenderAndRecipient(recipient, user)
                 .or(() -> friendshipRepository.findBySenderAndRecipient(user, recipient))
-                .orElseThrow(() -> new RuntimeException("Текущей подписки не обнаружено"));
+                .orElseThrow(() -> new SubscribeException("Текущей подписки не обнаружено"));
     }
 
     public Set<Long> getUsersIdByStatus(User user, FriendshipStatus status) {
