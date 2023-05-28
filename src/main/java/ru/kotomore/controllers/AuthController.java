@@ -1,10 +1,9 @@
 package ru.kotomore.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,28 +24,27 @@ public class AuthController {
 
     private final AuthService authService;
     private final RegistrationService registrationService;
-    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/registration")
-    public ResponseEntity<User> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) {
         log.info("Регистрация нового пользователя. Email - " + userDTO.getEmail());
         return ResponseEntity.of(registrationService.saveUser(userDTO));
     }
 
     @PostMapping("/login")
-    public JwtResponse login(@RequestBody JwtRequest authRequest) {
+    public JwtResponse login(@Valid @RequestBody JwtRequest authRequest) {
         log.info("Попытка авторизации. Email - " + authRequest.getEmail());
         return authService.login(authRequest);
     }
 
     @PostMapping("/refresh")
-    public JwtResponse refresh_token(@RequestBody RefreshJwtRequest request) {
+    public JwtResponse refresh_token(@Valid @RequestBody RefreshJwtRequest request) {
         log.info("Обновление токена");
         return authService.refresh(request.getRefreshToken());
     }
 
     @PostMapping("/token")
-    public JwtResponse getNewAccessToken(@RequestBody RefreshJwtRequest request) {
+    public JwtResponse getNewAccessToken(@Valid @RequestBody RefreshJwtRequest request) {
         log.info("Получение токена");
         return authService.getAccessToken(request.getRefreshToken());
     }

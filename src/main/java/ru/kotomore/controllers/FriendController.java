@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +20,7 @@ public class FriendController {
     private final FriendshipService friendshipService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> sendOrAcceptFriendRequest(@RequestBody FriendDTO friendDTO,
+    public ResponseEntity<String> sendOrAcceptFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
                                                             @AuthenticationPrincipal UserDetails userDetails) {
 
         String response = friendshipService.sendFriendRequest(userDetails.user(), friendDTO.getUserId());
@@ -27,7 +28,7 @@ public class FriendController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> rejectFriendRequest(@RequestBody FriendDTO friendDTO,
+    public ResponseEntity<String> rejectFriendRequest(@Valid @RequestBody FriendDTO friendDTO,
                                                       @AuthenticationPrincipal UserDetails userDetails) {
 
         String response = friendshipService.rejectFriendRequest(userDetails.user(), friendDTO.getUserId());

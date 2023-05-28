@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +19,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("/sendRequest")
-    public ResponseEntity<String> sendOrAcceptFriendRequest(@RequestBody MessageDTO messageDTO,
+    public ResponseEntity<String> sendOrAcceptFriendRequest(@Valid @RequestBody MessageDTO messageDTO,
                                                             @AuthenticationPrincipal UserDetails userDetails) {
 
         String response = messageService.sendMessageRequest(userDetails.user(), messageDTO);
