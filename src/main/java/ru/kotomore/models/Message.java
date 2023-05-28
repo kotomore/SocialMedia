@@ -32,4 +32,14 @@ public class Message {
     private String content;
 
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        createdAt = LocalDateTime.now();
+    }
 }
