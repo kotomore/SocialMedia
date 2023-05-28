@@ -1,5 +1,6 @@
 package ru.kotomore.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -52,21 +53,18 @@ public class PostController {
     }
 
     @PutMapping
-    public ResponseEntity<PostDTO> updatePost(@RequestBody PostDTO postDTO,
+    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
 
-        Post post = postService.getPostByUserAndId(userDetails.user(), postDTO.getId());
-        postService.updatePost(post, postDTO.getTitle(), postDTO.getBody());
-        PostDTO updatedPostDTO = modelMapper.map(post, PostDTO.class);
-        return ResponseEntity.ok(updatedPostDTO);
+        Post savedPost = postService.updatePost(userDetails.user(), postDTO);
+        return ResponseEntity.ok(modelMapper.map(savedPost, PostDTO.class));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable("id") Long id,
                                            @AuthenticationPrincipal UserDetails userDetails) {
 
-        Post post = postService.getPostByUserAndId(userDetails.user(), id);
-        postService.deletePost(post);
+        postService.deletePost(userDetails.user(), id);
         return ResponseEntity.noContent().build();
     }
 }

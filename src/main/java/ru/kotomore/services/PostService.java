@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.kotomore.dto.CreatePostDTO;
+import ru.kotomore.dto.PostDTO;
 import ru.kotomore.models.Post;
 import ru.kotomore.models.Subscription;
 import ru.kotomore.models.User;
@@ -27,7 +28,7 @@ public class PostService {
         post.setTitle(createPostDTO.getTitle());
         post.setBody(createPostDTO.getBody());
         post.setImageUrl(createPostDTO.getImageUrl());
-        //TODO: Добавить валидацию
+
         return postRepository.save(post);
     }
 
@@ -52,14 +53,18 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Пост с указанным идентификатором не найден"));
     }
 
-    public void updatePost(Post post, String newTitle, String newContent) {
-        post.setTitle(newTitle);
-        post.setBody(newContent);
-        //TODO Add validation
-        postRepository.save(post);
+    public Post updatePost(User user, PostDTO postDTO) {
+        Post post = getPostByUserAndId(user, postDTO.getId());
+
+        post.setTitle(post.getTitle());
+        post.setBody(post.getBody());
+        post.setImageUrl(post.getImageUrl());
+
+        return postRepository.save(post);
     }
 
-    public void deletePost(Post post) {
+    public void deletePost(User user, Long id) {
+        Post post = getPostByUserAndId(user, id);
         postRepository.delete(post);
     }
 }
