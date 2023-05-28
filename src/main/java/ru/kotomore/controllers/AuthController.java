@@ -29,13 +29,13 @@ public class AuthController {
 
     @PostMapping("/registration")
     public ResponseEntity<User> register(@RequestBody UserDTO userDTO) {
-        log.info("Register new user with email - " + userDTO.getEmail());
+        log.info("Регистрация нового пользователя. Email - " + userDTO.getEmail());
         return ResponseEntity.of(registrationService.saveUser(userDTO));
     }
 
     @PostMapping("/login")
     public JwtResponse login(@RequestBody JwtRequest authRequest) {
-        log.info("Try authenticate with login - " + authRequest.getEmail());
+        log.info("Попытка авторизации. Email - " + authRequest.getEmail());
         UsernamePasswordAuthenticationToken authInputToken =
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword());
         authenticationManager.authenticate(authInputToken);
@@ -44,13 +44,13 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public JwtResponse refresh_token(@RequestBody RefreshJwtRequest request) {
-        log.info("refresh token");
+        log.info("Обновление токена");
         return authService.refresh(request.getRefreshToken());
     }
 
     @PostMapping("/token")
     public JwtResponse getNewAccessToken(@RequestBody RefreshJwtRequest request) {
-        log.info("Get access token");
+        log.info("Получение токена");
         return authService.getAccessToken(request.getRefreshToken());
     }
 }

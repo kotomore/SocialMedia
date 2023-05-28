@@ -62,7 +62,7 @@ public class PostController {
                 .map(post -> modelMapper.map(post, PostDTO.class));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<PostDTO> updatePost(@RequestBody PostDTO postDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
 
