@@ -1,5 +1,6 @@
 package ru.kotomore.dto.security;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 public class JwtRequest implements Serializable {
 
     @NotEmpty(message = "не может быть пустым")
+    @Email(message = " должно содержать адрес электронной почты")
     public String email;
 
     @NotEmpty(message = "не может быть пустым")

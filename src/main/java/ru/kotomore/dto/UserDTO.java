@@ -19,7 +19,7 @@ public class UserDTO {
     private String username;
 
     @NotEmpty(message = "не может быть пустым")
-    @Email
+    @Email(message = " должно содержать адрес электронной почты")
     private String email;
 
     @NotEmpty(message = "не может быть пустым")
