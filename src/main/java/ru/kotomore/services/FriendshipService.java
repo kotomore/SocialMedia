@@ -117,12 +117,11 @@ public class FriendshipService {
                 .orElseThrow(() -> new SubscribeException("Текущей подписки не обнаружено"));
     }
 
-    public Set<Long> getUsersIdByStatus(User user, FriendshipStatus status) {
+    public Set<Long> getFriendsIdByStatus(User user, FriendshipStatus status) {
         return friendshipRepository.findByUserAndStatus(user, status)
                 .stream()
                 .flatMap(friendship -> Stream.of(friendship.getRecipient().getId(), friendship.getSender().getId()))
                 .filter(id -> !Objects.equals(id, user.getId()))
                 .collect(Collectors.toSet());
-
     }
 }
