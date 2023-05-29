@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  app:
+    image: 'social-media-postgres:latest'
+    ports:
+      - "8080:8080"
+    build:
+      context: .
+    container_name: SocialMedia
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+    depends_on:
+      - db
+
+  db:
+    image: 'postgres:15.0-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
