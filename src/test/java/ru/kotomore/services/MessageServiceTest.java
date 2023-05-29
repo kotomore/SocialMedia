@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import ru.kotomore.dto.MessageDTO;
 import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.exceptions.SendMessageException;
-import ru.kotomore.models.FriendshipStatus;
 import ru.kotomore.models.Message;
 import ru.kotomore.models.User;
 import ru.kotomore.repositories.MessageRepository;
@@ -51,7 +50,7 @@ public class MessageServiceTest {
 
         Set<Long> friendIds = new HashSet<>();
         friendIds.add(recipientId);
-        Mockito.when(friendshipService.getFriendsIdByStatus(user, FriendshipStatus.ACCEPTED)).thenReturn(friendIds);
+        Mockito.when(friendshipService.findFriendsByUser(user)).thenReturn(friendIds);
         Mockito.when(userRepository.findById(recipientId)).thenReturn(Optional.of(recipient));
         Mockito.when(messageRepository.existsBySenderAndRecipient(user, recipient)).thenReturn(false);
 
@@ -76,7 +75,7 @@ public class MessageServiceTest {
 
         Assertions.assertThrows(SendMessageException.class, () -> messageService.sendMessageRequest(user, messageDTO));
 
-        Mockito.verify(friendshipService, Mockito.times(0)).getFriendsIdByStatus(Mockito.any(User.class), Mockito.any(FriendshipStatus.class));
+        Mockito.verify(friendshipService, Mockito.times(0)).findFriendsByUser(Mockito.any(User.class));
         Mockito.verify(userRepository, Mockito.times(0)).findById(Mockito.anyLong());
         Mockito.verify(messageRepository, Mockito.times(0)).existsBySenderAndRecipient(Mockito.any(User.class), Mockito.any(User.class));
     }
@@ -98,7 +97,7 @@ public class MessageServiceTest {
         messageDTO.setText(text);
 
         Set<Long> friendIds = new HashSet<>();
-        Mockito.when(friendshipService.getFriendsIdByStatus(user, FriendshipStatus.ACCEPTED)).thenReturn(friendIds);
+        Mockito.when(friendshipService.findFriendsByUser(user)).thenReturn(friendIds);
 
         Assertions.assertThrows(SendMessageException.class, () -> messageService.sendMessageRequest(user, messageDTO));
 

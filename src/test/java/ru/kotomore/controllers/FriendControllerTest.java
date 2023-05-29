@@ -53,8 +53,17 @@ public class FriendControllerTest {
     }
 
     @Test
-    public void getFriends_ShouldReturnNoContent() throws Exception {
-        mvc.perform(get("/friends").contentType(MediaType.APPLICATION_JSON)
+    public void getFriendsRequest_ShouldReturnNoContent() throws Exception {
+        mvc.perform(get("/friends/request").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + getAccessToken())
+                        .param("status", "ACCEPTED")
+                )
+                .andExpect(status().is(204));
+    }
+
+    @Test
+    public void getFriendsResponse_ShouldReturnNoContent() throws Exception {
+        mvc.perform(get("/friends/response").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + getAccessToken())
                         .param("status", "ACCEPTED")
                 )
