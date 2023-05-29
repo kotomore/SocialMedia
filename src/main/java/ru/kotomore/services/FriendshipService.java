@@ -2,6 +2,7 @@ package ru.kotomore.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kotomore.dto.FriendResponseDTO;
 import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.exceptions.SubscribeException;
 import ru.kotomore.exceptions.UserNotFoundException;
@@ -13,6 +14,7 @@ import ru.kotomore.repositories.FriendshipRepository;
 import ru.kotomore.repositories.SubscriptionRepository;
 import ru.kotomore.repositories.UserRepository;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -139,14 +141,39 @@ public class FriendshipService {
     }
 
     /**
-     * Получить ID пользователей по статусу дружбы
+     * Получить ID пользователей, кто оставил заявку на дружбу
      *
-     * @param user    Пользователь, чьи заявки необходимо получить
-     * @param status  Статус заявки (Отменена, Подтверждена, В ожидании)
+     * @param user    Пользователь, кому отправляли заявку
      * @return Список ID пользователей
      */
-    public Set<Long> getFriendsIdByStatus(User user, FriendshipStatus status) {
-        return friendshipRepository.findByUserAndStatus(user, status)
+    public List<FriendResponseDTO> findFriendRequestIds(User user) {
+        return friendshipRepository.findByRecipient(user)
+                .stream()
+                .map(friendship -> new FriendResponseDTO(friendship.getSender().getId(), friendship.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Получить ID пользователей, которым user оставлял заявку на дружбу
+     *
+     * @param user    Пользователь, кто отправлял заявку
+     * @return Список ID пользователей
+     */
+    public List<FriendResponseDTO> findFriendResponseIds(User user) {
+        return friendshipRepository.findBySender(user)
+                .stream()
+                .map(friendship -> new FriendResponseDTO(friendship.getRecipient().getId(), friendship.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Получить ID друзей пользователя
+     *
+     * @param user    Пользователь, чьи заявки необходимо получить
+     * @return Список ID пользователей
+     */
+    public Set<Long> findFriendsByUser(User user) {
+        return friendshipRepository.findFriendsByUser(user)
                 .stream()
                 .flatMap(friendship -> Stream.of(friendship.getRecipient().getId(), friendship.getSender().getId()))
                 .filter(id -> !Objects.equals(id, user.getId()))

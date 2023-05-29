@@ -45,7 +45,7 @@ public class PostService {
      * @param pageable  Класс содержащий информацию о пагинации и сортировке
      * @return Посты пользователя
      */
-    public Page<Post> getPostsByUser(User user, Pageable pageable) {
+    public Page<Post> findPostsByUser(User user, Pageable pageable) {
         // Получение постов пользователя
         return postRepository.findByUser(user, pageable);
     }
@@ -57,7 +57,7 @@ public class PostService {
      * @param pageable  Класс содержащий информацию о пагинации и сортировке
      * @return Посты людей, на которых подписан пользователь
      */
-    public Page<Post> getPostsOfFollowedUsers(User user, Pageable pageable) {
+    public Page<Post> findPostsOfFollowedUsers(User user, Pageable pageable) {
 
         // Создание списка идентификаторов пользователей, на которых подписан текущий пользователь
         List<User> followingUsers = subscriptionRepository.findByFollower(user)

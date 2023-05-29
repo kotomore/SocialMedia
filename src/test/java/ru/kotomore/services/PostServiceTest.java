@@ -83,7 +83,7 @@ public class PostServiceTest {
         Mockito.when(postRepository.findByUser(user, pageable)).thenReturn(pageResult);
 
         // Act
-        Page<Post> result = postService.getPostsByUser(user, pageable);
+        Page<Post> result = postService.findPostsByUser(user, pageable);
 
         // Assert
         Assertions.assertNotNull(result);

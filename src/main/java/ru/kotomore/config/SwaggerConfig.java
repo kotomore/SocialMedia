@@ -14,6 +14,10 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customizeOpenAPI() {
         final String securitySchemeName = "bearerAuth";
+        final String securityDescription = """
+                1. Пройдите процесс аутентификации (/auth/login) и получите JWT токен.
+                2. Добавьте заголовок Authorization со значением Bearer <JWT токен> к каждому запросу, требующему авторизацию.
+                """;
 
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement()
@@ -26,6 +30,7 @@ public class SwaggerConfig {
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)
+                                .description(securityDescription)
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")));

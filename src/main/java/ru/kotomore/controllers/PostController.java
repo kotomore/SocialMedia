@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.kotomore.dto.CreatePostDTO;
 import ru.kotomore.dto.PostDTO;
 import ru.kotomore.models.Post;
+import ru.kotomore.models.User;
 import ru.kotomore.security.UserDetails;
 import ru.kotomore.services.PostService;
 
@@ -27,7 +28,7 @@ public class PostController {
 
     @PostMapping
     @Operation(summary = "Создать пост", description = "Позволяет создать пост для текущего пользователя")
-    public ResponseEntity<PostDTO> createPost(@RequestBody CreatePostDTO createpostDTO,
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody CreatePostDTO createpostDTO,
                                               @AuthenticationPrincipal UserDetails userDetails) {
 
         Post post = postService.createPost(userDetails.user(), createpostDTO);
@@ -36,9 +37,9 @@ public class PostController {
     }
 
     @GetMapping
-    @Operation(summary = "Посты пользователя", description = "Отображает посты пользователя," +
+    @Operation(summary = "Посты текущего пользователя", description = "Отображает посты пользователя," +
             "которые он создал")
-    public ResponseEntity<Page<PostDTO>> getUserPosts(
+    public ResponseEntity<Page<PostDTO>> findUserPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sort,
@@ -46,11 +47,34 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
 
-        Page<Post> userPosts = postService.getPostsByUser(userDetails.user(), pageable);
+        Page<Post> userPosts = postService.findPostsByUser(userDetails.user(), pageable);
         if (userPosts.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
             // Получаем DTO постов текущего пользователя
+            Page<PostDTO> postDTOs = userPosts.map(post -> modelMapper.map(post, PostDTO.class));
+            return ResponseEntity.ok(postDTOs);
+        }
+    }
+
+    @GetMapping("/users/{id}")
+    @Operation(summary = "Посты определенного пользователя", description = "Отображает посты пользователя," +
+            "чей ID указан")
+    public ResponseEntity<Page<PostDTO>> findUserPostsByUserId(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ASC") String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sort), "createdAt");
+
+        User user = new User();
+        user.setId(id);
+        Page<Post> userPosts = postService.findPostsByUser(user, pageable);
+        if (userPosts.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            // Получаем DTO постов пользователя
             Page<PostDTO> postDTOs = userPosts.map(post -> modelMapper.map(post, PostDTO.class));
             return ResponseEntity.ok(postDTOs);
         }

@@ -6,7 +6,6 @@ import ru.kotomore.dto.MessageDTO;
 import ru.kotomore.dto.SuccessMessage;
 import ru.kotomore.exceptions.SendMessageException;
 import ru.kotomore.exceptions.UserNotFoundException;
-import ru.kotomore.models.FriendshipStatus;
 import ru.kotomore.models.Message;
 import ru.kotomore.models.User;
 import ru.kotomore.repositories.MessageRepository;
@@ -35,7 +34,7 @@ public class MessageService {
             throw new SendMessageException("Вы не можете отправить сообщение себе");
         }
 
-        if (!friendshipService.getFriendsIdByStatus(user, FriendshipStatus.ACCEPTED).contains(recipientId)) {
+        if (!friendshipService.findFriendsByUser(user).contains(recipientId)) {
             throw new SendMessageException("Пользователь не добавлен в друзья");
         }
 
@@ -48,10 +47,10 @@ public class MessageService {
         }
 
         // Иначе создаем новую заявку
-        return createFriendRequest(user, recipient, text);
+        return createMessageRequest(user, recipient, text);
     }
 
-    private SuccessMessage createFriendRequest(User user, User recipient, String text) {
+    private SuccessMessage createMessageRequest(User user, User recipient, String text) {
         Message message = new Message();
         message.setSender(user);
         message.setRecipient(recipient);

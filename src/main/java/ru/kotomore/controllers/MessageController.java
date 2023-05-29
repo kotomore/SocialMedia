@@ -23,7 +23,7 @@ public class MessageController {
     @PostMapping
     @Operation(summary = "Отправляет запрос на переписку", description = "Пользователи являющиеся друзьями" +
             "могут отправить запрос на переписку")
-    public ResponseEntity<SuccessMessage> sendOrAcceptFriendRequest(@Valid @RequestBody MessageDTO messageDTO,
+    public ResponseEntity<SuccessMessage> sendMessageRequest(@Valid @RequestBody MessageDTO messageDTO,
                                                                     @AuthenticationPrincipal UserDetails userDetails) {
 
         SuccessMessage response = messageService.sendMessageRequest(userDetails.user(), messageDTO);

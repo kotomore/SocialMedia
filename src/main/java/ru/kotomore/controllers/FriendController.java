@@ -7,13 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.kotomore.dto.FriendDTO;
+import ru.kotomore.dto.FriendResponseDTO;
 import ru.kotomore.dto.SuccessMessage;
-import ru.kotomore.dto.UserFriendsDTO;
-import ru.kotomore.models.FriendshipStatus;
 import ru.kotomore.security.UserDetails;
 import ru.kotomore.services.FriendshipService;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/friends")
@@ -39,17 +38,27 @@ public class FriendController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    @Operation(summary = "Возвращает список заявок на дружбу", description = "В зависимости от выбранного статуса " +
+    @GetMapping("/requests")
+    @Operation(summary = "Возвращает список полученных заявок на дружбу", description = "В зависимости от выбранного статуса " +
             "отображает заявки на дружбу (Ожидает подтверждения, принята, отклонена)")
-    public ResponseEntity<UserFriendsDTO> getFriendList(@RequestParam FriendshipStatus status,
-                                                        @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<FriendResponseDTO>> getFriendRequestList(@AuthenticationPrincipal UserDetails userDetails) {
 
-        Set<Long> ids = friendshipService.getFriendsIdByStatus(userDetails.user(), status);
+        List<FriendResponseDTO> ids = friendshipService.findFriendRequestIds(userDetails.user());
         if (ids.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        UserFriendsDTO userFriendsDTO = new UserFriendsDTO(status.getDescription(), ids);
-        return ResponseEntity.ok(userFriendsDTO);
+        return ResponseEntity.ok(ids);
+    }
+
+    @GetMapping("/response")
+    @Operation(summary = "Возвращает список отправленных заявок на дружбу", description = "В зависимости от выбранного статуса " +
+            "отображает заявки на дружбу (Ожидает подтверждения, принята, отклонена)")
+    public ResponseEntity<List<FriendResponseDTO>> getFriendResponseList(@AuthenticationPrincipal UserDetails userDetails) {
+
+        List<FriendResponseDTO> ids = friendshipService.findFriendResponseIds(userDetails.user());
+        if (ids.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(ids);
     }
 }

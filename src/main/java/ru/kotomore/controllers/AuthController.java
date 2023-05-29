@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.kotomore.dto.CreatedUserDTO;
+import ru.kotomore.dto.UserResponseDTO;
 import ru.kotomore.dto.UserDTO;
 import ru.kotomore.dto.security.JwtRequest;
 import ru.kotomore.dto.security.JwtResponse;
@@ -32,9 +32,9 @@ public class AuthController {
             "доступа к функционалу приложения. При регистрации необходимо предоставить данные пользователя, " +
             "такие как имя, электронная почта и пароль. После успешной регистрации пользователь " +
             "получает доступ к своему аккаунту и может войти в систему")
-    public CreatedUserDTO register(@Valid @RequestBody UserDTO userDTO) {
+    public UserResponseDTO register(@Valid @RequestBody UserDTO userDTO) {
         log.info("Регистрация нового пользователя. Email - " + userDTO.getEmail());
-        return modelMapper.map(registrationService.saveUser(userDTO), CreatedUserDTO.class);
+        return modelMapper.map(registrationService.saveUser(userDTO), UserResponseDTO.class);
     }
 
     @PostMapping("/login")
