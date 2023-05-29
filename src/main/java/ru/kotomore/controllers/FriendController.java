@@ -38,7 +38,7 @@ public class FriendController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/requests")
+    @GetMapping("/request")
     @Operation(summary = "Возвращает список полученных заявок на дружбу", description = "В зависимости от выбранного статуса " +
             "отображает заявки на дружбу (Ожидает подтверждения, принята, отклонена)")
     public ResponseEntity<List<FriendResponseDTO>> getFriendRequestList(@AuthenticationPrincipal UserDetails userDetails) {
